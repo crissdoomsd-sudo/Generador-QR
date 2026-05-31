@@ -6,6 +6,7 @@
     <title>Generador de QR</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
@@ -135,7 +136,6 @@
         input[type="color"]::-webkit-color-swatch { border:2px solid var(--border); border-radius:8px; }
         .hex-color { font-family:'JetBrains Mono',monospace; font-size:0.82rem; color:var(--muted); }
 
-        /* ===== BOTONES GENERADORES ===== */
         .fila-generar { display:flex; gap:12px; margin-top:4px; }
         .btn {
             display:inline-flex; align-items:center; justify-content:center;
@@ -146,23 +146,16 @@
         }
         .btn-normal {
             background:linear-gradient(135deg,var(--accent),var(--accent2));
-            color:var(--bg);
-            box-shadow:0 4px 24px var(--accent-glow);
+            color:var(--bg); box-shadow:0 4px 24px var(--accent-glow);
         }
-        .btn-normal:hover {
-            transform:translateY(-2px);
-            box-shadow:0 6px 35px rgba(0,230,118,0.32);
-        }
+        .btn-normal:hover { transform:translateY(-2px); box-shadow:0 6px 35px rgba(0,230,118,0.32); }
         .btn-pirograbado {
             background:linear-gradient(135deg,var(--piro),var(--piro2));
-            color:#fff;
-            box-shadow:0 4px 24px var(--piro-glow);
+            color:#fff; box-shadow:0 4px 24px var(--piro-glow);
         }
-        .btn-pirograbado:hover {
-            transform:translateY(-2px);
-            box-shadow:0 6px 35px rgba(255,109,0,0.32);
-        }
+        .btn-pirograbado:hover { transform:translateY(-2px); box-shadow:0 6px 35px rgba(255,109,0,0.32); }
         .btn:active { transform:translateY(0) !important; }
+        .btn:disabled { opacity:0.6; cursor:wait; transform:none !important; }
 
         .btn-secundario { background:var(--bg2); color:var(--fg); border:1px solid var(--border); flex:1; box-shadow:none; }
         .btn-secundario:hover { background:var(--card-hover); border-color:var(--accent); color:var(--accent); transform:translateY(-1px); }
@@ -178,10 +171,6 @@
             padding:5px 12px; font-size:0.72rem; font-weight:600;
             font-family:'JetBrains Mono',monospace; letter-spacing:0.3px;
         }
-        .badge-resolucion.piro {
-            background:rgba(255,109,0,0.08); color:var(--piro);
-            border-color:rgba(255,109,0,0.18);
-        }
         .badge-resolucion i { font-size:0.72rem; }
 
         .badge-modo-activo {
@@ -192,15 +181,13 @@
         .badge-modo-activo.normal { background:rgba(0,230,118,0.1); color:var(--accent); border:1px solid rgba(0,230,118,0.2); }
         .badge-modo-activo.piro { background:rgba(255,109,0,0.1); color:var(--piro); border:1px solid rgba(255,109,0,0.2); }
 
-        /* ===== VISTA PREVIA ===== */
         .area-previa { display:flex; flex-direction:column; align-items:center; gap:16px; }
         .marco-qr {
             position:relative; background:#ffffff; border-radius:20px; padding:20px;
             display:flex; align-items:center; justify-content:center;
             min-width:180px; min-height:180px; max-width:100%;
             transition:transform 0.4s,box-shadow 0.4s;
-            box-shadow:0 8px 40px rgba(0,0,0,0.3);
-            overflow:hidden;
+            box-shadow:0 8px 40px rgba(0,0,0,0.3); overflow:hidden;
         }
         .marco-qr:hover { box-shadow:0 12px 50px rgba(0,0,0,0.4),0 0 40px var(--accent-glow); }
         .marco-qr .esquina { position:absolute; width:22px; height:22px; border-color:var(--accent); border-style:solid; border-width:0; transition:border-color 0.4s; }
@@ -218,12 +205,8 @@
         @keyframes vacioPulso { 0%,100%{opacity:0.3;transform:scale(1)} 50%{opacity:0.55;transform:scale(1.05)} }
         .qr-vacio p { color:var(--muted); font-size:0.9rem; line-height:1.5; }
 
-        .info-qr {
-            font-size:0.75rem; color:var(--muted); font-family:'JetBrains Mono',monospace;
-            text-align:center; line-height:1.6;
-        }
+        .info-qr { font-size:0.75rem; color:var(--muted); font-family:'JetBrains Mono',monospace; text-align:center; line-height:1.6; }
 
-        /* ===== TOAST ===== */
         .contenedor-toast { position:fixed; top:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:10px; }
         .toast {
             background:var(--card); border:1px solid var(--border); border-radius:12px;
@@ -242,7 +225,6 @@
         .toast-sale { animation:toastSale 0.3s ease-in forwards; }
         @keyframes toastSale { to{opacity:0;transform:translateX(60px)} }
 
-        /* ===== HISTORIAL ===== */
         .seccion-historial { margin-top:32px; }
         .grilla-historial { display:grid; grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); gap:12px; }
         .item-historial {
@@ -301,7 +283,6 @@
 
     <div class="grilla-principal">
 
-        <!-- Panel izquierdo -->
         <div class="tarjeta">
             <div class="tarjeta-titulo"><i class="fas fa-sliders-h"></i> Configuracion</div>
 
@@ -398,7 +379,6 @@
 
             <div class="separador"></div>
 
-            <!-- Colores -->
             <div class="grupo-form">
                 <label>Colores del QR</label>
                 <div class="fila-colores">
@@ -421,7 +401,6 @@
 
             <div class="separador"></div>
 
-            <!-- Dos botones de generacion -->
             <div class="fila-generar">
                 <button class="btn btn-normal" id="btnNormal" aria-label="Generar QR Normal">
                     <i class="fas fa-qrcode"></i> QR Normal
@@ -432,7 +411,6 @@
             </div>
         </div>
 
-        <!-- Panel derecho: Vista previa -->
         <div class="tarjeta">
             <div class="tarjeta-titulo"><i class="fas fa-eye"></i> Vista previa</div>
             <div class="area-previa">
@@ -461,7 +439,6 @@
         </div>
     </div>
 
-    <!-- Historial -->
     <section class="seccion-historial">
         <div class="tarjeta">
             <div class="tarjeta-titulo" style="justify-content:space-between;">
@@ -482,6 +459,7 @@
     // ===== Estado global =====
     var tipoActual = 'texto';
     var ultimoModo = 'normal';
+    var generando = false;
     var totalGenerados = parseInt(localStorage.getItem('qr_total') || '0');
     var historial = JSON.parse(localStorage.getItem('qr_historial') || '[]');
 
@@ -536,7 +514,7 @@
         toast.className = 'toast ' + tipo;
         toast.innerHTML = '<i class="fas '+iconos[tipo]+'"></i><span>'+mensaje+'</span>';
         contenedorToast.appendChild(toast);
-        setTimeout(function(){ toast.classList.add('toast-sale'); setTimeout(function(){ toast.remove(); }, 300); }, 3000);
+        setTimeout(function(){ toast.classList.add('toast-sale'); setTimeout(function(){ toast.remove(); }, 300); }, 3500);
     }
 
     // ===== Pestañas =====
@@ -601,7 +579,7 @@
         return e[tipo] || tipo;
     }
 
-    // ===== Generar QR NORMAL (1476x1476, nivel H) =====
+    // ===== Generar QR NORMAL (1476x1476, nivel H, colores del usuario) =====
     function generarQRNormal(datos) {
         var tempDiv = document.createElement('div');
         tempDiv.style.position = 'absolute';
@@ -626,11 +604,9 @@
         canvas.height = RESOLUCION;
         var ctx = canvas.getContext('2d');
 
-        // Fondo
         ctx.fillStyle = colorFondo.value;
         ctx.fillRect(0, 0, RESOLUCION, RESOLUCION);
 
-        // Modulos
         ctx.fillStyle = colorFrente.value;
         for (var row = 0; row < moduleCount; row++) {
             for (var col = 0; col < moduleCount; col++) {
@@ -647,28 +623,37 @@
 
         salidaQR.appendChild(canvas);
 
-        // Info
         infoQR.innerHTML = 'Modo: <strong>Normal</strong> | Correccion: H (30%) | Modulos: ' + moduleCount + 'x' + moduleCount + ' | Pixel por modulo: ' + moduleSize + 'px';
 
         setTimeout(function() { document.body.removeChild(tempDiv); }, 100);
     }
 
-    // ===== Generar QR PIROGRABADO (1476x1476, nivel L, blanco y negro puro) =====
-    function generarQRPirograbado(datos) {
-        var tempDiv = document.createElement('div');
-        tempDiv.style.position = 'absolute';
-        tempDiv.style.left = '-9999px';
-        document.body.appendChild(tempDiv);
+    // ===== Acortador de URL =====
+    async function acortarURL(urlLarga) {
+        // Intentar con is.gd
+        try {
+            var resp = await fetch('https://is.gd/create.php?format=simple&url=' + encodeURIComponent(urlLarga));
+            if (resp.ok) {
+                var corta = await resp.text();
+                if (corta && corta.startsWith('http')) return corta;
+            }
+        } catch(e) {}
 
-        var tempQR = new QRCode(tempDiv, {
-            text: datos,
-            width: 100,
-            height: 100,
-            correctLevel: QRCode.CorrectLevel.L
-        });
+        // Intentar con TinyURL
+        try {
+            var resp2 = await fetch('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(urlLarga));
+            if (resp2.ok) {
+                var corta2 = await resp2.text();
+                if (corta2 && corta2.startsWith('http')) return corta2;
+            }
+        } catch(e) {}
 
-        var qrModel = tempQR._oQRCode;
-        var moduleCount = qrModel.moduleCount;
+        return null;
+    }
+
+    // ===== Renderizar canvas pirograbado desde generador qrcode =====
+    function renderPirograbadoCanvas(qrGen, fueAcortado, infoVersion) {
+        var moduleCount = qrGen.getModuleCount();
         var moduleSize = Math.floor(RESOLUCION / moduleCount);
         var totalQR = moduleSize * moduleCount;
         var offset = Math.floor((RESOLUCION - totalQR) / 2);
@@ -678,15 +663,15 @@
         canvas.height = RESOLUCION;
         var ctx = canvas.getContext('2d');
 
-        // Fondo blanco puro
+        // Blanco puro
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, RESOLUCION, RESOLUCION);
 
-        // Modulos en negro puro
+        // Negro puro
         ctx.fillStyle = '#000000';
         for (var row = 0; row < moduleCount; row++) {
             for (var col = 0; col < moduleCount; col++) {
-                if (qrModel.isDark(row, col)) {
+                if (qrGen.isDark(row, col)) {
                     ctx.fillRect(
                         offset + col * moduleSize,
                         offset + row * moduleSize,
@@ -699,20 +684,85 @@
 
         salidaQR.appendChild(canvas);
 
-        // Info
-        infoQR.innerHTML = 'Modo: <strong>Pirograbado</strong> | Correccion: L (7%) | Modulos: ' + moduleCount + 'x' + moduleCount + ' | Pixel por modulo: <strong>' + moduleSize + 'px</strong> | Blanco y negro puro';
+        var infoExtra = fueAcortado ? ' | Link acortado' : '';
+        infoQR.innerHTML = 'Modo: <strong>Pirograbado</strong> | ' + infoVersion + ' | Pixel por modulo: <strong>' + moduleSize + 'px</strong> | Blanco y negro puro' + infoExtra;
+    }
 
-        setTimeout(function() { document.body.removeChild(tempDiv); }, 100);
+    // ===== Generar QR PIROGRABADO (Version 1 forzada, 21x21, nivel L) =====
+    async function generarQRPirograbado(datos) {
+        var datosParaQR = datos;
+        var fueAcortado = false;
+        var qrGen = null;
+
+        // ===================================================
+        // PASO 1: Intentar Version 1 forzada (21x21) + nivel L
+        // ===================================================
+        try {
+            qrGen = qrcode(1, 'L');
+            qrGen.addData(datosParaQR);
+            qrGen.make();
+            renderPirograbadoCanvas(qrGen, false, 'Version 1 forzada (21x21)');
+            return;
+        } catch(e) {
+            // No cabe en Version 1, continuar al paso 2
+        }
+
+        // ===================================================
+        // PASO 2: Si es un enlace, acortar automaticamente
+        // ===================================================
+        if (tipoActual === 'url' || datosParaQR.match(/^https?:\/\//i)) {
+            mostrarToast('Link muy largo para pixeles maximos, acortando...', 'info');
+
+            var urlCorta = await acortarURL(datosParaQR);
+
+            if (urlCorta) {
+                fueAcortado = true;
+                datosParaQR = urlCorta;
+
+                // Reintentar Version 1 con link acortado
+                try {
+                    qrGen = qrcode(1, 'L');
+                    qrGen.addData(datosParaQR);
+                    qrGen.make();
+                    renderPirograbadoCanvas(qrGen, true, 'Version 1 forzada (21x21) | Link acortado');
+                    mostrarToast('Link acortado y QR generado con pixeles maximos', 'exito');
+                    return;
+                } catch(e2) {
+                    // Aun con link corto no cabe en Version 1
+                }
+            } else {
+                mostrarToast('No se pudo acortar el link, usando version optimizada', 'info');
+            }
+        }
+
+        // ===================================================
+        // PASO 3: Fallback — version auto con nivel L
+        // (la menor cantidad de modulos posible = pixeles grandes)
+        // ===================================================
+        try {
+            qrGen = qrcode(0, 'L');
+            qrGen.addData(datosParaQR);
+            qrGen.make();
+            var mc = qrGen.getModuleCount();
+            renderPirograbadoCanvas(qrGen, fueAcortado, 'Version auto (' + mc + 'x' + mc + ') | Nivel L');
+            mostrarToast('QR generado con pixeles mas grandes posibles', 'exito');
+        } catch(e3) {
+            throw e3;
+        }
     }
 
     // ===== Funcion principal de generacion =====
-    function generarQR(modo) {
+    async function generarQR(modo) {
+        if (generando) return;
         var datos = obtenerDatosQR();
         if (!datos) {
             mostrarToast('Escribe algo antes de generar', 'error');
             return;
         }
 
+        generando = true;
+        btnNormal.disabled = true;
+        btnPirograbado.disabled = true;
         salidaQR.innerHTML = '';
         ultimoModo = modo;
 
@@ -726,7 +776,7 @@
                 badgeModo.className = 'badge-modo-activo normal';
                 badgeModo.innerHTML = '<i class="fas fa-qrcode"></i> Normal';
             } else {
-                generarQRPirograbado(datos);
+                await generarQRPirograbado(datos);
                 marcoQR.style.background = '#ffffff';
                 marcoQR.classList.add('modo-piro');
 
@@ -752,6 +802,10 @@
         } catch (e) {
             mostrarToast('Error al generar. Intenta con menos texto.', 'error');
             console.error(e);
+        } finally {
+            generando = false;
+            btnNormal.disabled = false;
+            btnPirograbado.disabled = false;
         }
     }
 
@@ -759,7 +813,6 @@
     btnNormal.addEventListener('click', function() { generarQR('normal'); });
     btnPirograbado.addEventListener('click', function() { generarQR('pirograbado'); });
 
-    // Enter para generar normal
     document.querySelectorAll('input[type="text"],input[type="url"]').forEach(function(inp) {
         inp.addEventListener('keydown', function(e) { if (e.key==='Enter') generarQR('normal'); });
     });
