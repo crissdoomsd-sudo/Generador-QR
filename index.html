@@ -200,6 +200,13 @@
         #salida-qr { display:flex; align-items:center; justify-content:center; overflow:auto; max-width:100%; }
         #salida-qr img, #salida-qr canvas { border-radius:4px; max-width:100%; height:auto; display:block; }
 
+        /* Escalado pixelado para modo pirograbado */
+        .marco-qr.modo-piro #salida-qr canvas {
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+
         .qr-vacio { text-align:center; padding:28px; }
         .qr-vacio i { font-size:3.8rem; color:var(--border); margin-bottom:14px; display:block; animation:vacioPulso 2.5s ease-in-out infinite; }
         @keyframes vacioPulso { 0%,100%{opacity:0.3;transform:scale(1)} 50%{opacity:0.55;transform:scale(1.05)} }
@@ -579,7 +586,9 @@
         return e[tipo] || tipo;
     }
 
-    // ===== Generar QR NORMAL (1476x1476, nivel H, colores del usuario) =====
+    // =========================================================================
+    //  QR NORMAL — Usa QRCode.js, nivel H, colores del usuario, 1476x1476
+    // =========================================================================
     function generarQRNormal(datos) {
         var tempDiv = document.createElement('div');
         tempDiv.style.position = 'absolute';
@@ -623,14 +632,19 @@
 
         salidaQR.appendChild(canvas);
 
-        infoQR.innerHTML = 'Modo: <strong>Normal</strong> | Correccion: H (30%) | Modulos: ' + moduleCount + 'x' + moduleCount + ' | Pixel por modulo: ' + moduleSize + 'px';
+        infoQR.innerHTML = 'Modo: <strong>Normal</strong> | Correccion: H (30%) | Modulos: '+moduleCount+'x'+moduleCount+' | Pixel por modulo: '+moduleSize+'px';
 
         setTimeout(function() { document.body.removeChild(tempDiv); }, 100);
     }
 
-    // ===== Acortador de URL =====
+    // =========================================================================
+    //  QR PIROGRABADO — Version 1 (21x21) + nivel L
+    //  Genera base pequenio (1 pixel por modulo) y escala a 1476x1476
+    //  sin suavizado para bloques perfectamente nítidos
+    // =========================================================================
+
+    // Acortador de URL
     async function acortarURL(urlLarga) {
-        // Intentar con is.gd
         try {
             var resp = await fetch('https://is.gd/create.php?format=simple&url=' + encodeURIComponent(urlLarga));
             if (resp.ok) {
@@ -638,8 +652,6 @@
                 if (corta && corta.startsWith('http')) return corta;
             }
         } catch(e) {}
-
-        // Intentar con TinyURL
         try {
             var resp2 = await fetch('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(urlLarga));
             if (resp2.ok) {
@@ -647,68 +659,77 @@
                 if (corta2 && corta2.startsWith('http')) return corta2;
             }
         } catch(e) {}
-
         return null;
     }
 
-    // ===== Renderizar canvas pirograbado desde generador qrcode =====
+    // Renderizar pirograbado: canvas base 1px por modulo -> escalar a 1476x1476 sin suavizado
     function renderPirograbadoCanvas(qrGen, fueAcortado, infoVersion) {
         var moduleCount = qrGen.getModuleCount();
-        var moduleSize = Math.floor(RESOLUCION / moduleCount);
-        var totalQR = moduleSize * moduleCount;
-        var offset = Math.floor((RESOLUCION - totalQR) / 2);
 
-        var canvas = document.createElement('canvas');
-        canvas.width = RESOLUCION;
-        canvas.height = RESOLUCION;
-        var ctx = canvas.getContext('2d');
+        // ---- PASO 1: Canvas base con 1 pixel por modulo ----
+        var baseCanvas = document.createElement('canvas');
+        baseCanvas.width = moduleCount;
+        baseCanvas.height = moduleCount;
+        var baseCtx = baseCanvas.getContext('2d');
 
-        // Blanco puro
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, RESOLUCION, RESOLUCION);
+        // Blanco puro como fondo
+        baseCtx.fillStyle = '#ffffff';
+        baseCtx.fillRect(0, 0, moduleCount, moduleCount);
 
-        // Negro puro
-        ctx.fillStyle = '#000000';
+        // Negro puro para modulos oscuros
+        baseCtx.fillStyle = '#000000';
         for (var row = 0; row < moduleCount; row++) {
             for (var col = 0; col < moduleCount; col++) {
                 if (qrGen.isDark(row, col)) {
-                    ctx.fillRect(
-                        offset + col * moduleSize,
-                        offset + row * moduleSize,
-                        moduleSize,
-                        moduleSize
-                    );
+                    baseCtx.fillRect(col, row, 1, 1);
                 }
             }
         }
 
-        salidaQR.appendChild(canvas);
+        // ---- PASO 2: Escalar a 1476x1476 sin suavizado ----
+        var finalCanvas = document.createElement('canvas');
+        finalCanvas.width = RESOLUCION;
+        finalCanvas.height = RESOLUCION;
+        var finalCtx = finalCanvas.getContext('2d');
 
+        // Desactivar cualquier suavizado
+        finalCtx.imageSmoothingEnabled = false;
+        finalCtx.mozImageSmoothingEnabled = false;
+        finalCtx.webkitImageSmoothingEnabled = false;
+        finalCtx.msImageSmoothingEnabled = false;
+
+        // Dibujar el canvas base pequenio escalado al tamano completo
+        // Sin suavizado, cada pixel se convierte en un bloque nítido
+        finalCtx.drawImage(baseCanvas, 0, 0, RESOLUCION, RESOLUCION);
+
+        salidaQR.appendChild(finalCanvas);
+
+        var pxPerModule = Math.floor(RESOLUCION / moduleCount);
         var infoExtra = fueAcortado ? ' | Link acortado' : '';
-        infoQR.innerHTML = 'Modo: <strong>Pirograbado</strong> | ' + infoVersion + ' | Pixel por modulo: <strong>' + moduleSize + 'px</strong> | Blanco y negro puro' + infoExtra;
+        infoQR.innerHTML = 'Modo: <strong>Pirograbado</strong> | ' + infoVersion + ' | Pixel por modulo: <strong>' + pxPerModule + 'px</strong> | Escalado sin suavizado' + infoExtra;
     }
 
-    // ===== Generar QR PIROGRABADO (Version 1 forzada, 21x21, nivel L) =====
+    // Funcion principal QR Pirograbado
     async function generarQRPirograbado(datos) {
         var datosParaQR = datos;
         var fueAcortado = false;
         var qrGen = null;
 
         // ===================================================
-        // PASO 1: Intentar Version 1 forzada (21x21) + nivel L
+        // PASO 1: Forzar Version 1 (21x21) + nivel L
         // ===================================================
         try {
             qrGen = qrcode(1, 'L');
             qrGen.addData(datosParaQR);
             qrGen.make();
-            renderPirograbadoCanvas(qrGen, false, 'Version 1 forzada (21x21)');
+            renderPirograbadoCanvas(qrGen, false, 'Version 1 forzada (21x21) | Nivel L');
             return;
         } catch(e) {
             // No cabe en Version 1, continuar al paso 2
         }
 
         // ===================================================
-        // PASO 2: Si es un enlace, acortar automaticamente
+        // PASO 2: Si es enlace, acortar automaticamente
         // ===================================================
         if (tipoActual === 'url' || datosParaQR.match(/^https?:\/\//i)) {
             mostrarToast('Link muy largo para pixeles maximos, acortando...', 'info');
@@ -724,7 +745,7 @@
                     qrGen = qrcode(1, 'L');
                     qrGen.addData(datosParaQR);
                     qrGen.make();
-                    renderPirograbadoCanvas(qrGen, true, 'Version 1 forzada (21x21) | Link acortado');
+                    renderPirograbadoCanvas(qrGen, true, 'Version 1 (21x21) | Nivel L | Link acortado');
                     mostrarToast('Link acortado y QR generado con pixeles maximos', 'exito');
                     return;
                 } catch(e2) {
@@ -737,14 +758,14 @@
 
         // ===================================================
         // PASO 3: Fallback — version auto con nivel L
-        // (la menor cantidad de modulos posible = pixeles grandes)
+        // (menor cantidad de modulos posible = pixeles grandes)
         // ===================================================
         try {
             qrGen = qrcode(0, 'L');
             qrGen.addData(datosParaQR);
             qrGen.make();
             var mc = qrGen.getModuleCount();
-            renderPirograbadoCanvas(qrGen, fueAcortado, 'Version auto (' + mc + 'x' + mc + ') | Nivel L');
+            renderPirograbadoCanvas(qrGen, fueAcortado, 'Version auto ('+mc+'x'+mc+') | Nivel L');
             mostrarToast('QR generado con pixeles mas grandes posibles', 'exito');
         } catch(e3) {
             throw e3;
