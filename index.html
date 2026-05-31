@@ -170,7 +170,9 @@
             border:1px solid rgba(0,230,118,0.18); border-radius:8px;
             padding:5px 12px; font-size:0.72rem; font-weight:600;
             font-family:'JetBrains Mono',monospace; letter-spacing:0.3px;
+            transition: all 0.3s;
         }
+        .badge-resolucion.piro { background:rgba(255,109,0,0.08); color:var(--piro); border-color:rgba(255,109,0,0.18); }
         .badge-resolucion i { font-size:0.72rem; }
 
         .badge-modo-activo {
@@ -186,7 +188,7 @@
             position:relative; background:#ffffff; border-radius:20px; padding:20px;
             display:flex; align-items:center; justify-content:center;
             min-width:180px; min-height:180px; max-width:100%;
-            transition:transform 0.4s,box-shadow 0.4s;
+            transition:transform 0.4s, box-shadow 0.4s, width 0.4s, height 0.4s;
             box-shadow:0 8px 40px rgba(0,0,0,0.3); overflow:hidden;
         }
         .marco-qr:hover { box-shadow:0 12px 50px rgba(0,0,0,0.4),0 0 40px var(--accent-glow); }
@@ -196,16 +198,13 @@
         .marco-qr .esquina.ii { bottom:-4px; left:-4px; border-bottom-width:3px; border-left-width:3px; border-radius:0 0 0 6px; }
         .marco-qr .esquina.id { bottom:-4px; right:-4px; border-bottom-width:3px; border-right-width:3px; border-radius:0 0 6px 0; }
         .marco-qr.modo-piro .esquina { border-color:var(--piro); }
+        
+        /* Transición de tamaño para el marco */
+        .marco-qr.modo-normal { width: auto; height: auto; max-width: 100%; }
+        .marco-qr.modo-piro { width: 300px; height: 300px; max-width: 100%; padding: 0; }
 
         #salida-qr { display:flex; align-items:center; justify-content:center; overflow:auto; max-width:100%; }
         #salida-qr img, #salida-qr canvas { border-radius:4px; max-width:100%; height:auto; display:block; }
-
-        /* Escalado pixelado para modo pirograbado */
-        .marco-qr.modo-piro #salida-qr canvas {
-            image-rendering: pixelated;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: crisp-edges;
-        }
 
         .qr-vacio { text-align:center; padding:28px; }
         .qr-vacio i { font-size:3.8rem; color:var(--border); margin-bottom:14px; display:block; animation:vacioPulso 2.5s ease-in-out infinite; }
@@ -285,7 +284,7 @@
     <div class="barra-estadisticas">
         <div class="chip-stat"><i class="fas fa-layer-group"></i> Generados: <span id="statTotal">0</span></div>
         <div class="chip-stat"><i class="fas fa-bolt"></i> Tiempo real</div>
-        <div class="chip-stat"><i class="fas fa-lock"></i> 1476 x 1476 px</div>
+        <div class="chip-stat"><i class="fas fa-lock"></i> Tamano segun modo</div>
     </div>
 
     <div class="grilla-principal">
@@ -387,7 +386,7 @@
             <div class="separador"></div>
 
             <div class="grupo-form">
-                <label>Colores del QR</label>
+                <label>Colores del QR (Solo modo Normal)</label>
                 <div class="fila-colores">
                     <div class="grupo-color">
                         <label for="color-frente">Frontal</label>
@@ -422,7 +421,7 @@
             <div class="tarjeta-titulo"><i class="fas fa-eye"></i> Vista previa</div>
             <div class="area-previa">
                 <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
-                    <span class="badge-resolucion"><i class="fas fa-lock"></i> 1476 x 1476 px fijo</span>
+                    <span class="badge-resolucion" id="badgeResolucion"><i class="fas fa-lock"></i> Selecciona un modo</span>
                     <span class="badge-modo-activo" id="badgeModo" style="display:none;"></span>
                 </div>
                 <div class="marco-qr" id="marcoQR">
@@ -460,9 +459,6 @@
 </div>
 
 <script>
-    // ===== Constante de resolucion fija =====
-    var RESOLUCION = 1476;
-
     // ===== Estado global =====
     var tipoActual = 'texto';
     var ultimoModo = 'normal';
@@ -490,6 +486,7 @@
     var contenedorToast = document.getElementById('contenedorToast');
     var infoQR = document.getElementById('infoQR');
     var badgeModo = document.getElementById('badgeModo');
+    var badgeResolucion = document.getElementById('badgeResolucion');
     var btnNormal = document.getElementById('btnNormal');
     var btnPirograbado = document.getElementById('btnPirograbado');
 
@@ -587,9 +584,10 @@
     }
 
     // =========================================================================
-    //  QR NORMAL — Usa QRCode.js, nivel H, colores del usuario, 1476x1476
+    //  QR NORMAL — Usa QRCode.js, nivel H, 1476x1476
     // =========================================================================
     function generarQRNormal(datos) {
+        var resolucion = 1476;
         var tempDiv = document.createElement('div');
         tempDiv.style.position = 'absolute';
         tempDiv.style.left = '-9999px';
@@ -604,18 +602,20 @@
 
         var qrModel = tempQR._oQRCode;
         var moduleCount = qrModel.moduleCount;
-        var moduleSize = Math.floor(RESOLUCION / moduleCount);
+        var moduleSize = Math.floor(resolucion / moduleCount);
         var totalQR = moduleSize * moduleCount;
-        var offset = Math.floor((RESOLUCION - totalQR) / 2);
+        var offset = Math.floor((resolucion - totalQR) / 2);
 
         var canvas = document.createElement('canvas');
-        canvas.width = RESOLUCION;
-        canvas.height = RESOLUCION;
+        canvas.width = resolucion;
+        canvas.height = resolucion;
         var ctx = canvas.getContext('2d');
 
+        // Fondo limpio sin cuadrícula
         ctx.fillStyle = colorFondo.value;
-        ctx.fillRect(0, 0, RESOLUCION, RESOLUCION);
+        ctx.fillRect(0, 0, resolucion, resolucion);
 
+        // Módulos de datos
         ctx.fillStyle = colorFrente.value;
         for (var row = 0; row < moduleCount; row++) {
             for (var col = 0; col < moduleCount; col++) {
@@ -632,15 +632,13 @@
 
         salidaQR.appendChild(canvas);
 
-        infoQR.innerHTML = 'Modo: <strong>Normal</strong> | Correccion: H (30%) | Modulos: '+moduleCount+'x'+moduleCount+' | Pixel por modulo: '+moduleSize+'px';
+        infoQR.innerHTML = 'Modo: <strong>Normal</strong> | Lienzo: '+resolucion+'x'+resolucion+'px | Correccion: H (30%) | Modulos: '+moduleCount+'x'+moduleCount+' | Pixel por modulo: '+moduleSize+'px';
 
         setTimeout(function() { document.body.removeChild(tempDiv); }, 100);
     }
 
     // =========================================================================
-    //  QR PIROGRABADO — Version 1 (21x21) + nivel L
-    //  Genera base pequenio (1 pixel por modulo) y escala a 1476x1476
-    //  sin suavizado para bloques perfectamente nítidos
+    //  QR PIROGRABADO — Version 1 (21x21) + nivel L, 300x300
     // =========================================================================
 
     // Acortador de URL
@@ -662,8 +660,9 @@
         return null;
     }
 
-    // Renderizar pirograbado: canvas base 1px por modulo -> escalar a 1476x1476 sin suavizado
+    // Renderizar pirograbado: canvas base 1px por modulo -> escalar a 300x300 sin suavizado
     function renderPirograbadoCanvas(qrGen, fueAcortado, infoVersion) {
+        var resolucion = 300; // Tamaño fijo para modo pirograbado
         var moduleCount = qrGen.getModuleCount();
 
         // ---- PASO 1: Canvas base con 1 pixel por modulo ----
@@ -672,11 +671,11 @@
         baseCanvas.height = moduleCount;
         var baseCtx = baseCanvas.getContext('2d');
 
-        // Blanco puro como fondo
+        // Blanco puro como fondo limpio
         baseCtx.fillStyle = '#ffffff';
         baseCtx.fillRect(0, 0, moduleCount, moduleCount);
 
-        // Negro puro para modulos oscuros
+        // Negro puro para módulos, sin líneas guía
         baseCtx.fillStyle = '#000000';
         for (var row = 0; row < moduleCount; row++) {
             for (var col = 0; col < moduleCount; col++) {
@@ -686,38 +685,34 @@
             }
         }
 
-        // ---- PASO 2: Escalar a 1476x1476 sin suavizado ----
+        // ---- PASO 2: Escalar a 300x300 sin suavizado ----
         var finalCanvas = document.createElement('canvas');
-        finalCanvas.width = RESOLUCION;
-        finalCanvas.height = RESOLUCION;
+        finalCanvas.width = resolucion;
+        finalCanvas.height = resolucion;
         var finalCtx = finalCanvas.getContext('2d');
 
-        // Desactivar cualquier suavizado
+        // Desactivar cualquier suavizado para bloques nítidos
         finalCtx.imageSmoothingEnabled = false;
         finalCtx.mozImageSmoothingEnabled = false;
         finalCtx.webkitImageSmoothingEnabled = false;
         finalCtx.msImageSmoothingEnabled = false;
 
-        // Dibujar el canvas base pequenio escalado al tamano completo
-        // Sin suavizado, cada pixel se convierte en un bloque nítido
-        finalCtx.drawImage(baseCanvas, 0, 0, RESOLUCION, RESOLUCION);
+        finalCtx.drawImage(baseCanvas, 0, 0, resolucion, resolucion);
 
         salidaQR.appendChild(finalCanvas);
 
-        var pxPerModule = Math.floor(RESOLUCION / moduleCount);
+        var pxPerModule = (resolucion / moduleCount).toFixed(2);
         var infoExtra = fueAcortado ? ' | Link acortado' : '';
-        infoQR.innerHTML = 'Modo: <strong>Pirograbado</strong> | ' + infoVersion + ' | Pixel por modulo: <strong>' + pxPerModule + 'px</strong> | Escalado sin suavizado' + infoExtra;
+        infoQR.innerHTML = 'Modo: <strong>Pirograbado</strong> | Lienzo: '+resolucion+'x'+resolucion+'px | ' + infoVersion + ' | Pixel por modulo: <strong>'+pxPerModule+'px</strong> | Blanco y negro puro' + infoExtra;
     }
 
-    // Funcion principal QR Pirograbado
+    // Función principal QR Pirograbado
     async function generarQRPirograbado(datos) {
         var datosParaQR = datos;
         var fueAcortado = false;
         var qrGen = null;
 
-        // ===================================================
         // PASO 1: Forzar Version 1 (21x21) + nivel L
-        // ===================================================
         try {
             qrGen = qrcode(1, 'L');
             qrGen.addData(datosParaQR);
@@ -728,9 +723,7 @@
             // No cabe en Version 1, continuar al paso 2
         }
 
-        // ===================================================
-        // PASO 2: Si es enlace, acortar automaticamente
-        // ===================================================
+        // PASO 2: Si es enlace, acortar automáticamente
         if (tipoActual === 'url' || datosParaQR.match(/^https?:\/\//i)) {
             mostrarToast('Link muy largo para pixeles maximos, acortando...', 'info');
 
@@ -756,10 +749,7 @@
             }
         }
 
-        // ===================================================
         // PASO 3: Fallback — version auto con nivel L
-        // (menor cantidad de modulos posible = pixeles grandes)
-        // ===================================================
         try {
             qrGen = qrcode(0, 'L');
             qrGen.addData(datosParaQR);
@@ -792,14 +782,22 @@
                 generarQRNormal(datos);
                 marcoQR.style.background = colorFondo.value;
                 marcoQR.classList.remove('modo-piro');
+                marcoQR.classList.add('modo-normal');
 
+                badgeResolucion.innerHTML = '<i class="fas fa-lock"></i> 1476 x 1476 px fijo';
+                badgeResolucion.classList.remove('piro');
+                
                 badgeModo.style.display = 'inline-flex';
                 badgeModo.className = 'badge-modo-activo normal';
                 badgeModo.innerHTML = '<i class="fas fa-qrcode"></i> Normal';
             } else {
                 await generarQRPirograbado(datos);
                 marcoQR.style.background = '#ffffff';
+                marcoQR.classList.remove('modo-normal');
                 marcoQR.classList.add('modo-piro');
+
+                badgeResolucion.innerHTML = '<i class="fas fa-lock"></i> 300 x 300 px fijo';
+                badgeResolucion.classList.add('piro');
 
                 badgeModo.style.display = 'inline-flex';
                 badgeModo.className = 'badge-modo-activo piro';
@@ -815,7 +813,7 @@
             agregarAlHistorial(datos, modo);
 
             var nombreModo = modo === 'normal' ? 'Normal' : 'Pirograbado';
-            mostrarToast('QR ' + nombreModo + ' generado (1476x1476)', 'exito');
+            mostrarToast('QR ' + nombreModo + ' generado', 'exito');
 
             marcoQR.style.transform = 'scale(0.94)';
             setTimeout(function() { marcoQR.style.transform = 'scale(1)'; }, 220);
@@ -844,11 +842,12 @@
         if (!canvas) { mostrarToast('No hay QR para descargar', 'error'); return; }
 
         var link = document.createElement('a');
+        var resolucion = (ultimoModo === 'normal') ? '1476x1476' : '300x300';
         var sufijo = ultimoModo === 'pirograbado' ? 'pirograbado' : 'normal';
-        link.download = 'qr-' + tipoActual + '-' + sufijo + '-1476x1476.png';
+        link.download = 'qr-' + tipoActual + '-' + sufijo + '-' + resolucion + '.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
-        mostrarToast('QR descargado como PNG (1476x1476)', 'exito');
+        mostrarToast('QR descargado como PNG (' + resolucion + ')', 'exito');
     });
 
     // ===== Copiar QR =====
