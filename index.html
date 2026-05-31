@@ -15,6 +15,7 @@
             --accent: #00e676; --accent2: #00c853; --accent-glow: rgba(0,230,118,0.22);
             --danger: #ff5252; --warning: #ffab40;
             --piro: #ff6d00; --piro2: #e65100; --piro-glow: rgba(255,109,0,0.22);
+            --short: #00bcd4; --short2: #0097a7; --short-glow: rgba(0,188,212,0.22);
         }
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Space Grotesk',sans-serif; background:var(--bg); color:var(--fg); min-height:100vh; overflow-x:hidden; }
@@ -26,7 +27,7 @@
         @keyframes gridMove { 0%{transform:translate(0,0)} 100%{transform:translate(44px,44px)} }
         .bg-blob { position:fixed; border-radius:50%; filter:blur(130px); z-index:0; pointer-events:none; }
         .bg-blob-1 { width:520px; height:520px; background:rgba(0,230,118,0.06); top:-160px; right:-120px; animation:bF1 14s ease-in-out infinite; }
-        .bg-blob-2 { width:400px; height:400px; background:rgba(255,109,0,0.03); bottom:-100px; left:-80px; animation:bF2 18s ease-in-out infinite; }
+        .bg-blob-2 { width:400px; height:400px; background:rgba(0,188,212,0.04); bottom:-100px; left:-80px; animation:bF2 18s ease-in-out infinite; }
         @keyframes bF1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-40px,50px) scale(1.12)} }
         @keyframes bF2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(50px,-40px) scale(1.1)} }
         .particula { position:fixed; border-radius:50%; pointer-events:none; z-index:0; background:var(--accent); opacity:0; }
@@ -49,7 +50,8 @@
         .tarjeta { background:var(--card); border:1px solid var(--border); border-radius:22px; padding:26px; transition:border-color 0.3s; }
         .tarjeta:hover { border-color:rgba(0,230,118,0.18); }
         .tarjeta-titulo { font-size:1.1rem; font-weight:700; margin-bottom:18px; display:flex; align-items:center; gap:10px; }
-        .tarjeta-titulo i { color:var(--accent); font-size:1rem; }
+        .tarjeta-titulo i { font-size:1rem; }
+        .icono-normal { color:var(--accent); } .icono-piro { color:var(--piro); } .icono-short { color:var(--short); }
         .pestannas-tipo { display:flex; gap:6px; margin-bottom:20px; background:var(--bg2); border-radius:14px; padding:5px; }
         .pestanna {
             flex:1; padding:12px 6px; text-align:center; border-radius:10px; cursor:pointer;
@@ -96,11 +98,14 @@
         .btn-normal:hover { transform:translateY(-2px); box-shadow:0 6px 35px rgba(0,230,118,0.32); }
         .btn-pirograbado { background:linear-gradient(135deg,var(--piro),var(--piro2)); color:#fff; box-shadow:0 4px 24px var(--piro-glow); }
         .btn-pirograbado:hover { transform:translateY(-2px); box-shadow:0 6px 35px rgba(255,109,0,0.32); }
+        .btn-acortar { background:linear-gradient(135deg,var(--short),var(--short2)); color:#fff; box-shadow:0 4px 24px var(--short-glow); }
+        .btn-acortar:hover { transform:translateY(-2px); box-shadow:0 6px 35px rgba(0,188,212,0.32); }
         .btn:active { transform:translateY(0) !important; } .btn:disabled { opacity:0.6; cursor:wait; transform:none !important; }
         .btn-secundario { background:var(--bg2); color:var(--fg); border:1px solid var(--border); flex:1; box-shadow:none; }
         .btn-secundario:hover { background:var(--card-hover); border-color:var(--accent); color:var(--accent); transform:translateY(-1px); }
         .btn-peligro { background:transparent; color:var(--danger); border:1px solid rgba(255,82,82,0.25); flex:none; }
         .btn-peligro:hover { background:rgba(255,82,82,0.08); border-color:var(--danger); }
+        .btn-sm { padding:10px 16px; font-size:0.78rem; border-radius:10px; flex:none; }
         .fila-botones { display:flex; gap:10px; margin-top:10px; width:100%; }
         .badge-resolucion {
             display:inline-flex; align-items:center; gap:6px; background:rgba(0,230,118,0.08); color:var(--accent);
@@ -138,11 +143,45 @@
             display:flex; align-items:center; gap:10px; font-size:0.88rem; min-width:250px;
             box-shadow:0 8px 30px rgba(0,0,0,0.4); animation:toastEntra 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
         }
-        .toast.exito { border-left:3px solid var(--accent); } .toast.error { border-left:3px solid var(--danger); } .toast.info { border-left:3px solid var(--warning); }
-        .toast.exito i { color:var(--accent); } .toast.error i { color:var(--danger); } .toast.info i { color:var(--warning); } .toast i { font-size:1.1rem; }
+        .toast.exito { border-left:3px solid var(--accent); } .toast.error { border-left:3px solid var(--danger); } .toast.info { border-left:3px solid var(--short); }
+        .toast.exito i { color:var(--accent); } .toast.error i { color:var(--danger); } .toast.info i { color:var(--short); } .toast i { font-size:1.1rem; }
         @keyframes toastEntra { from{opacity:0;transform:translateX(60px)} to{opacity:1;transform:translateX(0)} }
         .toast-sale { animation:toastSale 0.3s ease-in forwards; } @keyframes toastSale { to{opacity:0;transform:translateX(60px)} }
-        .seccion-historial { margin-top:32px; }
+
+        /* ===== ACORTADOR ===== */
+        .seccion-acortador { margin-top:28px; }
+        .resultado-acortador {
+            display:none; margin-top:16px; padding:18px; background:var(--bg2);
+            border:1.5px solid var(--border); border-radius:16px; animation:panelAparece 0.4s ease-out;
+        }
+        .resultado-acortador.visible { display:block; }
+        .resultado-acortador .etiqueta-resultado { font-size:0.72rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+        .resultado-acortador .url-resultado {
+            display:flex; align-items:center; gap:12px; background:var(--card);
+            border:1px solid var(--border); border-radius:12px; padding:12px 16px;
+        }
+        .resultado-acortador .url-resultado .url-texto {
+            flex:1; font-family:'JetBrains Mono',monospace; font-size:0.9rem;
+            color:var(--short); word-break:break-all; cursor:pointer; transition:color 0.2s;
+        }
+        .resultado-acortador .url-resultado .url-texto:hover { color:var(--fg); }
+        .resultado-acortador .info-acortador {
+            margin-top:10px; font-size:0.75rem; color:var(--muted);
+            font-family:'JetBrains Mono',monospace; display:flex; gap:16px; flex-wrap:wrap;
+        }
+        .resultado-acortador .info-acortador span { display:flex; align-items:center; gap:5px; }
+        .resultado-acortador .info-acortador i { color:var(--short); font-size:0.7rem; }
+        .proveedor-badge {
+            display:inline-flex; align-items:center; gap:4px;
+            background:rgba(0,188,212,0.1); color:var(--short);
+            border:1px solid rgba(0,188,212,0.2); border-radius:6px;
+            padding:3px 8px; font-size:0.65rem; font-weight:700;
+            text-transform:uppercase; letter-spacing:0.3px;
+        }
+        .fila-acortador-acciones { display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+        .fila-acortador-acciones .btn { font-size:0.8rem; padding:12px 16px; }
+
+        .seccion-historial { margin-top:28px; }
         .grilla-historial { display:grid; grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); gap:12px; }
         .item-historial {
             background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:14px;
@@ -178,12 +217,12 @@
     </header>
     <div class="barra-estadisticas">
         <div class="chip-stat"><i class="fas fa-layer-group"></i> Generados: <span id="statTotal">0</span></div>
-        <div class="chip-stat"><i class="fas fa-bolt"></i> Tiempo real</div>
+        <div class="chip-stat"><i class="fas fa-bolt"></i> Ajuste automatico</div>
         <div class="chip-stat"><i class="fas fa-lock"></i> 1476 x 1476 px</div>
     </div>
     <div class="grilla-principal">
         <div class="tarjeta">
-            <div class="tarjeta-titulo"><i class="fas fa-sliders-h"></i> Configuracion</div>
+            <div class="tarjeta-titulo"><i class="fas fa-sliders-h icono-normal"></i> Configuracion</div>
             <div class="pestannas-tipo" id="pestannasTipo" role="tablist">
                 <button class="pestanna activa" data-tipo="texto" role="tab" aria-selected="true"><i class="fas fa-font"></i>Texto</button>
                 <button class="pestanna" data-tipo="url" role="tab" aria-selected="false"><i class="fas fa-link"></i>Enlace</button>
@@ -191,53 +230,21 @@
                 <button class="pestanna" data-tipo="correo" role="tab" aria-selected="false"><i class="fas fa-envelope"></i>Correo</button>
                 <button class="pestanna" data-tipo="telefono" role="tab" aria-selected="false"><i class="fas fa-phone"></i>Telefono</button>
             </div>
-            <div class="panel-entrada activa" id="panel-texto">
-                <div class="grupo-form"><label for="entrada-texto">Texto o mensaje</label><div class="contenedor-input">
-                    <textarea id="entrada-texto" placeholder="Escribe cualquier texto aqui..." maxlength="900" aria-label="Texto"></textarea>
-                    <i class="fas fa-pen" style="top:16px;transform:none;"></i></div>
-                    <div class="conteo-caracteres" id="conteoTexto">0 / 900</div></div>
-            </div>
-            <div class="panel-entrada" id="panel-url">
-                <div class="grupo-form"><label for="entrada-url">Direccion web</label><div class="contenedor-input">
-                    <input type="url" id="entrada-url" placeholder="https://ejemplo.com" aria-label="URL"><i class="fas fa-globe"></i></div></div>
-            </div>
-            <div class="panel-entrada" id="panel-wifi">
-                <div class="grupo-form"><label for="entrada-wifi-nombre">Nombre de red (SSID)</label><div class="contenedor-input">
-                    <input type="text" id="entrada-wifi-nombre" placeholder="MiRedWiFi" aria-label="SSID"><i class="fas fa-wifi"></i></div></div>
-                <div class="grupo-form"><label for="entrada-wifi-clave">Contrasena</label><div class="contenedor-input">
-                    <input type="text" id="entrada-wifi-clave" placeholder="contrasena123" aria-label="Clave"><i class="fas fa-key"></i></div></div>
-                <div class="grupo-form"><label for="entrada-wifi-cifrado">Tipo de cifrado</label><div class="contenedor-input">
-                    <select id="entrada-wifi-cifrado" aria-label="Cifrado"><option value="WPA">WPA / WPA2</option><option value="WEP">WEP</option><option value="nopass">Sin cifrado</option></select>
-                    <i class="fas fa-shield-halved"></i></div></div>
-            </div>
-            <div class="panel-entrada" id="panel-correo">
-                <div class="grupo-form"><label for="entrada-correo-direccion">Correo electronico</label><div class="contenedor-input">
-                    <input type="text" id="entrada-correo-direccion" placeholder="correo@ejemplo.com" aria-label="Correo"><i class="fas fa-at"></i></div></div>
-                <div class="grupo-form"><label for="entrada-correo-asunto">Asunto</label><div class="contenedor-input">
-                    <input type="text" id="entrada-correo-asunto" placeholder="Asunto del correo" aria-label="Asunto"><i class="fas fa-tag"></i></div></div>
-                <div class="grupo-form"><label for="entrada-correo-cuerpo">Mensaje</label><div class="contenedor-input">
-                    <textarea id="entrada-correo-cuerpo" placeholder="Cuerpo del mensaje..." aria-label="Cuerpo" style="min-height:80px"></textarea>
-                    <i class="fas fa-message" style="top:16px;transform:none;"></i></div></div>
-            </div>
-            <div class="panel-entrada" id="panel-telefono">
-                <div class="grupo-form"><label for="entrada-telefono">Numero de telefono</label><div class="contenedor-input">
-                    <input type="text" id="entrada-telefono" placeholder="+52 55 1234 5678" aria-label="Telefono"><i class="fas fa-phone"></i></div></div>
-            </div>
+            <div class="panel-entrada activa" id="panel-texto"><div class="grupo-form"><label for="entrada-texto">Texto o mensaje</label><div class="contenedor-input"><textarea id="entrada-texto" placeholder="Escribe cualquier texto aqui..." maxlength="900" aria-label="Texto"></textarea><i class="fas fa-pen" style="top:16px;transform:none;"></i></div><div class="conteo-caracteres" id="conteoTexto">0 / 900</div></div></div>
+            <div class="panel-entrada" id="panel-url"><div class="grupo-form"><label for="entrada-url">Direccion web</label><div class="contenedor-input"><input type="url" id="entrada-url" placeholder="https://ejemplo.com" aria-label="URL"><i class="fas fa-globe"></i></div></div></div>
+            <div class="panel-entrada" id="panel-wifi"><div class="grupo-form"><label for="entrada-wifi-nombre">Nombre de red (SSID)</label><div class="contenedor-input"><input type="text" id="entrada-wifi-nombre" placeholder="MiRedWiFi" aria-label="SSID"><i class="fas fa-wifi"></i></div></div><div class="grupo-form"><label for="entrada-wifi-clave">Contrasena</label><div class="contenedor-input"><input type="text" id="entrada-wifi-clave" placeholder="contrasena123" aria-label="Clave"><i class="fas fa-key"></i></div></div><div class="grupo-form"><label for="entrada-wifi-cifrado">Tipo de cifrado</label><div class="contenedor-input"><select id="entrada-wifi-cifrado" aria-label="Cifrado"><option value="WPA">WPA / WPA2</option><option value="WEP">WEP</option><option value="nopass">Sin cifrado</option></select><i class="fas fa-shield-halved"></i></div></div></div>
+            <div class="panel-entrada" id="panel-correo"><div class="grupo-form"><label for="entrada-correo-direccion">Correo electronico</label><div class="contenedor-input"><input type="text" id="entrada-correo-direccion" placeholder="correo@ejemplo.com" aria-label="Correo"><i class="fas fa-at"></i></div></div><div class="grupo-form"><label for="entrada-correo-asunto">Asunto</label><div class="contenedor-input"><input type="text" id="entrada-correo-asunto" placeholder="Asunto del correo" aria-label="Asunto"><i class="fas fa-tag"></i></div></div><div class="grupo-form"><label for="entrada-correo-cuerpo">Mensaje</label><div class="contenedor-input"><textarea id="entrada-correo-cuerpo" placeholder="Cuerpo del mensaje..." aria-label="Cuerpo" style="min-height:80px"></textarea><i class="fas fa-message" style="top:16px;transform:none;"></i></div></div></div>
+            <div class="panel-entrada" id="panel-telefono"><div class="grupo-form"><label for="entrada-telefono">Numero de telefono</label><div class="contenedor-input"><input type="text" id="entrada-telefono" placeholder="+52 55 1234 5678" aria-label="Telefono"><i class="fas fa-phone"></i></div></div></div>
             <div class="separador"></div>
-            <div class="grupo-form"><label>Colores del QR (Solo modo Normal)</label><div class="fila-colores">
-                <div class="grupo-color"><label for="color-frente">Frontal</label><div class="selector-color">
-                    <input type="color" id="color-frente" value="#000000" aria-label="Color frontal"><span class="hex-color" id="hexFrente">#000000</span></div></div>
-                <div class="grupo-color"><label for="color-fondo">Fondo</label><div class="selector-color">
-                    <input type="color" id="color-fondo" value="#ffffff" aria-label="Color de fondo"><span class="hex-color" id="hexFondo">#FFFFFF</span></div></div>
-            </div></div>
+            <div class="grupo-form"><label>Colores del QR (Solo modo Normal)</label><div class="fila-colores"><div class="grupo-color"><label for="color-frente">Frontal</label><div class="selector-color"><input type="color" id="color-frente" value="#000000" aria-label="Color frontal"><span class="hex-color" id="hexFrente">#000000</span></div></div><div class="grupo-color"><label for="color-fondo">Fondo</label><div class="selector-color"><input type="color" id="color-fondo" value="#ffffff" aria-label="Color de fondo"><span class="hex-color" id="hexFondo">#FFFFFF</span></div></div></div></div>
             <div class="separador"></div>
             <div class="fila-generar">
-                <button class="btn btn-normal" id="btnNormal" aria-label="Generar QR Normal"><i class="fas fa-qrcode"></i> QR Normal</button>
-                <button class="btn btn-pirograbado" id="btnPirograbado" aria-label="Generar QR Pirograbado"><i class="fas fa-fire"></i> QR Pirograbado</button>
+                <button class="btn btn-normal" id="btnNormal"><i class="fas fa-qrcode"></i> QR Normal</button>
+                <button class="btn btn-pirograbado" id="btnPirograbado"><i class="fas fa-fire"></i> QR Pirograbado</button>
             </div>
         </div>
         <div class="tarjeta">
-            <div class="tarjeta-titulo"><i class="fas fa-eye"></i> Vista previa</div>
+            <div class="tarjeta-titulo"><i class="fas fa-eye icono-normal"></i> Vista previa</div>
             <div class="area-previa">
                 <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
                     <span class="badge-resolucion" id="badgeResolucion"><i class="fas fa-lock"></i> 1476 x 1476 px fijo</span>
@@ -255,9 +262,48 @@
             </div>
         </div>
     </div>
+
+    <!-- ===== ACORTADOR DE URL ===== -->
+    <section class="seccion-acortador">
+        <div class="tarjeta">
+            <div class="tarjeta-titulo"><i class="fas fa-scissors icono-short"></i> Acortador de URL</div>
+            <p style="color:var(--muted);font-size:0.88rem;margin-bottom:16px;line-height:1.5;">
+                Acorta tu enlace aqui y copialo manualmente. Luego pegalo en la pestana de Enlace arriba y genera tu QR Pirograbado. Cuanto mas corto el link, mas grandes los bloques.
+            </p>
+            <div class="grupo-form" style="margin-bottom:0;">
+                <label for="acortador-url">URL larga a acortar</label>
+                <div class="contenedor-input">
+                    <input type="url" id="acortador-url" placeholder="https://www.ejemplo.com/pagina/muy/larga/con-muchos-parametros" aria-label="URL a acortar">
+                    <i class="fas fa-link"></i>
+                </div>
+            </div>
+            <div style="margin-top:14px;">
+                <button class="btn btn-acortar" id="btnAcortar" style="width:100%;">
+                    <i class="fas fa-scissors"></i> Acortar URL
+                </button>
+            </div>
+            <div class="resultado-acortador" id="resultadoAcortador">
+                <div class="etiqueta-resultado">URL acortada <span class="proveedor-badge" id="proveedorBadge"></span></div>
+                <div class="url-resultado">
+                    <span class="url-texto" id="urlAcortadaTexto" title="Clic para copiar"></span>
+                    <button class="btn btn-secundario btn-sm" id="btnCopiarAcortada"><i class="fas fa-copy"></i> Copiar</button>
+                </div>
+                <div class="info-acortador">
+                    <span><i class="fas fa-ruler-horizontal"></i> Original: <strong id="longitudOriginal">0</strong> caracteres</span>
+                    <span><i class="fas fa-compress"></i> Acortada: <strong id="longitudAcortada">0</strong> caracteres</span>
+                    <span><i class="fas fa-percentage"></i> Reduccion: <strong id="porcentajeReduccion">0%</strong></span>
+                </div>
+                <div class="fila-acortador-acciones">
+                    <button class="btn btn-pirograbado" id="btnQRPiroAcortada" style="flex:1;"><i class="fas fa-fire"></i> Generar QR Pirograbado</button>
+                    <button class="btn btn-normal" id="btnQRNormalAcortada" style="flex:1;"><i class="fas fa-qrcode"></i> Generar QR Normal</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="seccion-historial"><div class="tarjeta">
         <div class="tarjeta-titulo" style="justify-content:space-between;">
-            <span><i class="fas fa-clock-rotate-left"></i> Historial reciente</span>
+            <span><i class="fas fa-clock-rotate-left icono-normal"></i> Historial reciente</span>
             <button class="btn btn-peligro" id="btnLimpiarHistorial" style="padding:6px 14px;font-size:0.72rem;display:none;"><i class="fas fa-trash"></i> Limpiar</button>
         </div>
         <div class="grilla-historial" id="grillaHistorial"><div class="historial-vacio"><i class="fas fa-inbox"></i>Tus codigos QR generados apareceran aqui</div></div>
@@ -271,6 +317,7 @@
     var generando = false;
     var totalGenerados = parseInt(localStorage.getItem('qr_total') || '0');
     var historial = JSON.parse(localStorage.getItem('qr_historial') || '[]');
+    var ultimaUrlAcortada = '';
 
     var pestannas = document.querySelectorAll('.pestanna');
     var paneles = document.querySelectorAll('.panel-entrada');
@@ -294,6 +341,18 @@
     var badgeResolucion = document.getElementById('badgeResolucion');
     var btnNormal = document.getElementById('btnNormal');
     var btnPirograbado = document.getElementById('btnPirograbado');
+
+    var acortadorUrl = document.getElementById('acortador-url');
+    var btnAcortar = document.getElementById('btnAcortar');
+    var resultadoAcortador = document.getElementById('resultadoAcortador');
+    var urlAcortadaTexto = document.getElementById('urlAcortadaTexto');
+    var proveedorBadge = document.getElementById('proveedorBadge');
+    var longitudOriginal = document.getElementById('longitudOriginal');
+    var longitudAcortada = document.getElementById('longitudAcortada');
+    var porcentajeReduccion = document.getElementById('porcentajeReduccion');
+    var btnCopiarAcortada = document.getElementById('btnCopiarAcortada');
+    var btnQRPiroAcortada = document.getElementById('btnQRPiroAcortada');
+    var btnQRNormalAcortada = document.getElementById('btnQRNormalAcortada');
 
     statTotal.textContent = totalGenerados;
 
@@ -332,215 +391,203 @@
             default: return '';
         }
     }
-
     function etiquetaTipo(tipo) { var e={texto:'Texto',url:'Enlace',wifi:'WiFi',correo:'Correo',telefono:'Telefono'}; return e[tipo]||tipo; }
 
     // ====================================================================
-    //  QR NORMAL — QRCode.js, nivel H, 1476x1476, colores personalizables
+    //  QR NORMAL — nivel H, colores personalizables, 1476x1476
     // ====================================================================
     function generarQRNormal(datos) {
         var tempDiv = document.createElement('div');
         tempDiv.style.position = 'absolute'; tempDiv.style.left = '-9999px';
         document.body.appendChild(tempDiv);
         var tempQR = new QRCode(tempDiv, { text:datos, width:100, height:100, correctLevel:QRCode.CorrectLevel.H });
-        var qrModel = tempQR._oQRCode;
-        var moduleCount = qrModel.moduleCount;
+        var qrModel = tempQR._oQRCode; var moduleCount = qrModel.moduleCount;
         var moduleSize = Math.floor(RESOLUCION / moduleCount);
-        var totalQR = moduleSize * moduleCount;
-        var offset = Math.floor((RESOLUCION - totalQR) / 2);
-
-        var canvas = document.createElement('canvas');
-        canvas.width = RESOLUCION; canvas.height = RESOLUCION;
+        var totalQR = moduleSize * moduleCount; var offset = Math.floor((RESOLUCION - totalQR) / 2);
+        var canvas = document.createElement('canvas'); canvas.width = RESOLUCION; canvas.height = RESOLUCION;
         var ctx = canvas.getContext('2d');
         ctx.fillStyle = colorFondo.value; ctx.fillRect(0,0,RESOLUCION,RESOLUCION);
         ctx.fillStyle = colorFrente.value;
-        for(var row=0; row<moduleCount; row++){
-            for(var col=0; col<moduleCount; col++){
-                if(qrModel.isDark(row,col)){
-                    ctx.fillRect(offset+col*moduleSize, offset+row*moduleSize, moduleSize, moduleSize);
-                }
-            }
-        }
+        for(var row=0;row<moduleCount;row++){for(var col=0;col<moduleCount;col++){if(qrModel.isDark(row,col)){ctx.fillRect(offset+col*moduleSize,offset+row*moduleSize,moduleSize,moduleSize);}}}
         salidaQR.appendChild(canvas);
         infoQR.innerHTML = 'Modo: <strong>Normal</strong> | Lienzo: '+RESOLUCION+'x'+RESOLUCION+'px | Correccion: H (30%) | Modulos: '+moduleCount+'x'+moduleCount+' | Pixel por modulo: '+moduleSize+'px';
         setTimeout(function(){ document.body.removeChild(tempDiv); }, 100);
     }
 
     // ====================================================================
-    //  QR PIROGRABADO — Version 1 forzada (21x21), nivel L, 1476x1476
-    //  Renderizado DIRECTO: cada modulo = 70px exactos, solido, sin bordes
+    //  QR PIROGRABADO — Se ajusta automaticamente al contenido
+    //  Intenta Version 1 primero, si no cabe sube de version automaticamente
+    //  Sin acortamiento automatico, sin mensajes de "acortando"
     // ====================================================================
-
-    async function acortarURL(urlLarga) {
-        try { var r=await fetch('https://is.gd/create.php?format=simple&url='+encodeURIComponent(urlLarga)); if(r.ok){var c=await r.text();if(c&&c.startsWith('http'))return c;} } catch(e){}
-        try { var r2=await fetch('https://tinyurl.com/api-create.php?url='+encodeURIComponent(urlLarga)); if(r2.ok){var c2=await r2.text();if(c2&&c2.startsWith('http'))return c2;} } catch(e){}
-        return null;
-    }
-
-    // Renderizado directo de modulos como bloques solidos
-    function renderPirograbadoCanvas(qrGen, fueAcortado, infoVersion) {
+    function renderPirograbadoCanvas(qrGen, infoVersion) {
         var moduleCount = qrGen.getModuleCount();
-
-        // Tamaño exacto por modulo: el entero mas grande que cabe en 1476
         var moduleSize = Math.floor(RESOLUCION / moduleCount);
-
-        // Espacio total que ocupa el QR
         var totalQR = moduleSize * moduleCount;
-
-        // Margen para centrar el QR en el lienzo
         var offset = Math.floor((RESOLUCION - totalQR) / 2);
-
-        var canvas = document.createElement('canvas');
-        canvas.width = RESOLUCION;
-        canvas.height = RESOLUCION;
+        var canvas = document.createElement('canvas'); canvas.width = RESOLUCION; canvas.height = RESOLUCION;
         var ctx = canvas.getContext('2d');
-
-        // Fondo blanco puro, sin cuadriculas ni lineas
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, RESOLUCION, RESOLUCION);
-
-        // Dibujar cada modulo como un bloque solido de moduleSize x moduleSize
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,RESOLUCION,RESOLUCION);
         ctx.fillStyle = '#000000';
-        for (var row = 0; row < moduleCount; row++) {
-            for (var col = 0; col < moduleCount; col++) {
-                if (qrGen.isDark(row, col)) {
-                    ctx.fillRect(
-                        offset + col * moduleSize,
-                        offset + row * moduleSize,
-                        moduleSize,
-                        moduleSize
-                    );
-                }
-            }
-        }
-
+        for(var row=0;row<moduleCount;row++){for(var col=0;col<moduleCount;col++){if(qrGen.isDark(row,col)){ctx.fillRect(offset+col*moduleSize,offset+row*moduleSize,moduleSize,moduleSize);}}}
         salidaQR.appendChild(canvas);
-
-        var infoExtra = fueAcortado ? ' | Link acortado' : '';
-        infoQR.innerHTML = 'Modo: <strong>Pirograbado</strong> | Lienzo: '+RESOLUCION+'x'+RESOLUCION+'px | ' + infoVersion + ' | Pixel por modulo: <strong>'+moduleSize+'px</strong> x '+moduleSize+'px | Bloques solidos | Blanco y negro puro' + infoExtra;
+        infoQR.innerHTML = 'Modo: <strong>Pirograbado</strong> | Lienzo: '+RESOLUCION+'x'+RESOLUCION+'px | '+infoVersion+' | Modulos: '+moduleCount+'x'+moduleCount+' | Pixel por modulo: <strong>'+moduleSize+'px</strong> x '+moduleSize+'px | Blanco y negro puro';
     }
 
-    async function generarQRPirograbado(datos) {
-        var datosParaQR = datos;
-        var fueAcortado = false;
+    function generarQRPirograbado(datos) {
         var qrGen = null;
 
-        // PASO 1: Forzar Version 1 (21x21) + nivel L
-        // 1476 / 21 = 70.28... -> cada bloque = 70x70 pixeles GIGANTE
-        try {
-            qrGen = qrcode(1, 'L');
-            qrGen.addData(datosParaQR);
-            qrGen.make();
-            renderPirograbadoCanvas(qrGen, false, 'Version 1 forzada (21x21) | Nivel L');
-            return;
-        } catch(e) { /* No cabe en Version 1 */ }
-
-        // PASO 2: Si es enlace, acortar automaticamente
-        if (tipoActual === 'url' || datosParaQR.match(/^https?:\/\//i)) {
-            mostrarToast('Link muy largo para bloques maximos, acortando...', 'info');
-            var urlCorta = await acortarURL(datosParaQR);
-            if (urlCorta) {
-                fueAcortado = true;
-                datosParaQR = urlCorta;
-                try {
-                    qrGen = qrcode(1, 'L');
-                    qrGen.addData(datosParaQR);
-                    qrGen.make();
-                    renderPirograbadoCanvas(qrGen, true, 'Version 1 (21x21) | Nivel L | Link acortado');
-                    mostrarToast('Link acortado y QR generado con bloques de 70px', 'exito');
-                    return;
-                } catch(e2) { /* Ni con link corto cabe en V1 */ }
-            } else {
-                mostrarToast('No se pudo acortar el link, usando version optimizada', 'info');
-            }
-        }
-
-        // PASO 3: Fallback — version auto con nivel L (modulos minimos)
+        // Intentar desde Version 1 hasta la mas grande necesaria
+        // qrcode(0, 'L') = version automatica (la mas pequena que quepa)
         try {
             qrGen = qrcode(0, 'L');
-            qrGen.addData(datosParaQR);
+            qrGen.addData(datos);
             qrGen.make();
-            var mc = qrGen.getModuleCount();
-            renderPirograbadoCanvas(qrGen, fueAcortado, 'Version auto ('+mc+'x'+mc+') | Nivel L');
-            mostrarToast('QR generado con bloques mas grandes posibles', 'exito');
-        } catch(e3) { throw e3; }
+            var moduleCount = qrGen.getModuleCount();
+
+            // Determinar version usada segun modulos
+            // Version N = 17 + 4*N modulos
+            var version = (moduleCount - 17) / 4;
+            var versionEntera = Math.round(version);
+
+            var infoVersion = 'Version ' + versionEntera + ' (' + moduleCount + 'x' + moduleCount + ' modulos) | Nivel L';
+            renderPirograbadoCanvas(qrGen, infoVersion);
+        } catch(e) {
+            throw e;
+        }
     }
 
-    // ===== Funcion principal de generacion =====
-    async function generarQR(modo) {
+    // ===== Generacion principal =====
+    async function generarQR(modo, datosOverride) {
         if (generando) return;
-        var datos = obtenerDatosQR();
+        var datos = datosOverride || obtenerDatosQR();
         if (!datos) { mostrarToast('Escribe algo antes de generar', 'error'); return; }
-
         generando = true; btnNormal.disabled = true; btnPirograbado.disabled = true;
         salidaQR.innerHTML = ''; ultimoModo = modo;
-
         try {
             if (modo === 'normal') {
-                generarQRNormal(datos);
-                marcoQR.style.background = colorFondo.value;
-                marcoQR.classList.remove('modo-piro');
-                badgeResolucion.innerHTML = '<i class="fas fa-lock"></i> 1476 x 1476 px fijo';
-                badgeResolucion.classList.remove('piro');
-                badgeModo.style.display = 'inline-flex';
-                badgeModo.className = 'badge-modo-activo normal';
-                badgeModo.innerHTML = '<i class="fas fa-qrcode"></i> Normal';
+                generarQRNormal(datos); marcoQR.style.background = colorFondo.value; marcoQR.classList.remove('modo-piro');
+                badgeResolucion.innerHTML = '<i class="fas fa-lock"></i> 1476 x 1476 px fijo'; badgeResolucion.classList.remove('piro');
+                badgeModo.style.display = 'inline-flex'; badgeModo.className = 'badge-modo-activo normal'; badgeModo.innerHTML = '<i class="fas fa-qrcode"></i> Normal';
             } else {
-                await generarQRPirograbado(datos);
-                marcoQR.style.background = '#ffffff';
-                marcoQR.classList.add('modo-piro');
-                badgeResolucion.innerHTML = '<i class="fas fa-lock"></i> 1476 x 1476 px fijo';
-                badgeResolucion.classList.add('piro');
-                badgeModo.style.display = 'inline-flex';
-                badgeModo.className = 'badge-modo-activo piro';
-                badgeModo.innerHTML = '<i class="fas fa-fire"></i> Pirograbado';
+                generarQRPirograbado(datos); marcoQR.style.background = '#ffffff'; marcoQR.classList.add('modo-piro');
+                badgeResolucion.innerHTML = '<i class="fas fa-lock"></i> 1476 x 1476 px fijo'; badgeResolucion.classList.add('piro');
+                badgeModo.style.display = 'inline-flex'; badgeModo.className = 'badge-modo-activo piro'; badgeModo.innerHTML = '<i class="fas fa-fire"></i> Pirograbado';
             }
-
             botonesAccion.style.display = 'flex';
             totalGenerados++; statTotal.textContent = totalGenerados;
             localStorage.setItem('qr_total', totalGenerados.toString());
             agregarAlHistorial(datos, modo);
-            var nombreModo = modo === 'normal' ? 'Normal' : 'Pirograbado';
-            mostrarToast('QR ' + nombreModo + ' generado (1476x1476)', 'exito');
-            marcoQR.style.transform = 'scale(0.94)';
-            setTimeout(function(){ marcoQR.style.transform = 'scale(1)'; }, 220);
-        } catch (e) {
-            mostrarToast('Error al generar. Intenta con menos texto.', 'error');
-        } finally {
-            generando = false; btnNormal.disabled = false; btnPirograbado.disabled = false;
-        }
+            mostrarToast('QR ' + (modo === 'normal' ? 'Normal' : 'Pirograbado') + ' generado (1476x1476)', 'exito');
+            marcoQR.style.transform = 'scale(0.94)'; setTimeout(function(){ marcoQR.style.transform = 'scale(1)'; }, 220);
+        } catch (e) { mostrarToast('Error al generar. Intenta con menos texto.', 'error'); }
+        finally { generando = false; btnNormal.disabled = false; btnPirograbado.disabled = false; }
     }
 
     btnNormal.addEventListener('click', function(){ generarQR('normal'); });
     btnPirograbado.addEventListener('click', function(){ generarQR('pirograbado'); });
-    document.querySelectorAll('input[type="text"],input[type="url"]').forEach(function(inp){
-        inp.addEventListener('keydown', function(e){ if(e.key==='Enter') generarQR('normal'); });
-    });
+    document.querySelectorAll('input[type="text"],input[type="url"]').forEach(function(inp){ inp.addEventListener('keydown', function(e){ if(e.key==='Enter') generarQR('normal'); }); });
 
     btnDescargar.addEventListener('click', function(){
-        var canvas = salidaQR.querySelector('canvas');
-        if(!canvas){ mostrarToast('No hay QR para descargar','error'); return; }
+        var canvas = salidaQR.querySelector('canvas'); if(!canvas){mostrarToast('No hay QR','error');return;}
         var link = document.createElement('a');
         link.download = 'qr-'+tipoActual+'-'+(ultimoModo==='pirograbado'?'pirograbado':'normal')+'-1476x1476.png';
-        link.href = canvas.toDataURL('image/png'); link.click();
-        mostrarToast('QR descargado (1476x1476)','exito');
+        link.href = canvas.toDataURL('image/png'); link.click(); mostrarToast('QR descargado (1476x1476)','exito');
+    });
+    btnCopiar.addEventListener('click', async function(){
+        var canvas = salidaQR.querySelector('canvas'); if(!canvas){mostrarToast('No hay QR','error');return;}
+        try{var blob=await new Promise(function(r){canvas.toBlob(r,'image/png');});await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);mostrarToast('QR copiado','exito');}
+        catch(e){mostrarToast('No se pudo copiar. Intenta descargar.','info');}
     });
 
-    btnCopiar.addEventListener('click', async function(){
-        var canvas = salidaQR.querySelector('canvas');
-        if(!canvas){ mostrarToast('No hay QR para copiar','error'); return; }
-        try { var blob = await new Promise(function(r){canvas.toBlob(r,'image/png');}); await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]); mostrarToast('QR copiado al portapapeles','exito'); }
-        catch(e){ mostrarToast('No se pudo copiar. Intenta descargar.','info'); }
+    // ====================================================================
+    //  ACORTADOR DE URL — Apartado independiente
+    // ====================================================================
+    async function acortarURL(urlLarga) {
+        try { var r=await fetch('https://is.gd/create.php?format=simple&url='+encodeURIComponent(urlLarga)); if(r.ok){var c=await r.text();if(c&&c.startsWith('http'))return{url:c,proveedor:'is.gd'};} } catch(e){}
+        try { var r2=await fetch('https://tinyurl.com/api-create.php?url='+encodeURIComponent(urlLarga)); if(r2.ok){var c2=await r2.text();if(c2&&c2.startsWith('http'))return{url:c2,proveedor:'TinyURL'};} } catch(e){}
+        return null;
+    }
+
+    btnAcortar.addEventListener('click', async function(){
+        var url = acortadorUrl.value.trim();
+        if (!url) { mostrarToast('Ingresa una URL para acortar', 'error'); return; }
+        if (!url.match(/^https?:\/\//i)) { url = 'https://' + url; acortadorUrl.value = url; }
+
+        btnAcortar.disabled = true;
+        btnAcortar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Acortando...';
+
+        var resultado = await acortarURL(url);
+
+        btnAcortar.disabled = false;
+        btnAcortar.innerHTML = '<i class="fas fa-scissors"></i> Acortar URL';
+
+        if (resultado) {
+            ultimaUrlAcortada = resultado.url;
+            urlAcortadaTexto.textContent = resultado.url;
+            proveedorBadge.textContent = resultado.proveedor;
+
+            var longOrig = url.length;
+            var longCorta = resultado.url.length;
+            var reduccion = Math.round(((longOrig - longCorta) / longOrig) * 100);
+
+            longitudOriginal.textContent = longOrig;
+            longitudAcortada.textContent = longCorta;
+            porcentajeReduccion.textContent = reduccion + '%';
+
+            resultadoAcortador.classList.add('visible');
+            mostrarToast('URL acortada con ' + resultado.proveedor, 'exito');
+        } else {
+            mostrarToast('No se pudo acortar la URL. Intenta de nuevo.', 'error');
+        }
+    });
+
+    acortadorUrl.addEventListener('keydown', function(e){ if(e.key==='Enter') btnAcortar.click(); });
+
+    // Clic en la URL acortada para copiar
+    urlAcortadaTexto.addEventListener('click', function(){
+        if (!ultimaUrlAcortada) return;
+        navigator.clipboard.writeText(ultimaUrlAcortada).then(function(){
+            mostrarToast('URL copiada al portapapeles', 'exito');
+        }).catch(function(){});
+    });
+
+    btnCopiarAcortada.addEventListener('click', function(){
+        if (!ultimaUrlAcortada) return;
+        navigator.clipboard.writeText(ultimaUrlAcortada).then(function(){
+            mostrarToast('URL acortada copiada al portapapeles', 'exito');
+        }).catch(function(){ mostrarToast('No se pudo copiar', 'error'); });
+    });
+
+    // Generar QR Pirograbado con URL acortada
+    btnQRPiroAcortada.addEventListener('click', function(){
+        if (!ultimaUrlAcortada) { mostrarToast('Acorta una URL primero', 'error'); return; }
+        tipoActual = 'url';
+        pestannas.forEach(function(p){p.classList.remove('activa');p.setAttribute('aria-selected','false');if(p.getAttribute('data-tipo')==='url'){p.classList.add('activa');p.setAttribute('aria-selected','true');}});
+        paneles.forEach(function(p){p.classList.remove('activa');});
+        document.getElementById('panel-url').classList.add('activa');
+        document.getElementById('entrada-url').value = ultimaUrlAcortada;
+        generarQR('pirograbado', ultimaUrlAcortada);
+        marcoQR.scrollIntoView({ behavior:'smooth', block:'center' });
+    });
+
+    // Generar QR Normal con URL acortada
+    btnQRNormalAcortada.addEventListener('click', function(){
+        if (!ultimaUrlAcortada) { mostrarToast('Acorta una URL primero', 'error'); return; }
+        tipoActual = 'url';
+        pestannas.forEach(function(p){p.classList.remove('activa');p.setAttribute('aria-selected','false');if(p.getAttribute('data-tipo')==='url'){p.classList.add('activa');p.setAttribute('aria-selected','true');}});
+        paneles.forEach(function(p){p.classList.remove('activa');});
+        document.getElementById('panel-url').classList.add('activa');
+        document.getElementById('entrada-url').value = ultimaUrlAcortada;
+        generarQR('normal', ultimaUrlAcortada);
+        marcoQR.scrollIntoView({ behavior:'smooth', block:'center' });
     });
 
     // ===== Historial =====
     function agregarAlHistorial(datos, modo) {
-        var tempDiv = document.createElement('div');
-        tempDiv.style.position='absolute'; tempDiv.style.left='-9999px'; document.body.appendChild(tempDiv);
+        var tempDiv = document.createElement('div'); tempDiv.style.position='absolute'; tempDiv.style.left='-9999px'; document.body.appendChild(tempDiv);
         new QRCode(tempDiv, {text:datos,width:80,height:80,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
         setTimeout(function(){
-            var canvas = tempDiv.querySelector('canvas');
-            var imgSrc = canvas ? canvas.toDataURL('image/png') : '';
+            var canvas=tempDiv.querySelector('canvas'); var imgSrc=canvas?canvas.toDataURL('image/png'):'';
             historial.unshift({id:Date.now(),tipo:tipoActual,modo:modo,datos:datos,imgSrc:imgSrc,hora:new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})});
             if(historial.length>12) historial.pop();
             try{localStorage.setItem('qr_historial',JSON.stringify(historial));}catch(e){}
